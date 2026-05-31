@@ -557,3 +557,161 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway \
 ---
 
 *Guide current as of May 2026. Check [ollama.com](https://ollama.com) and [github.com/ggerganov/llama.cpp](https://github.com/ggerganov/llama.cpp) for the latest updates.*
+
+
+# Ways to get Llama models as standalone files without installing any service.
+
+---
+
+### Option 1: Direct GGUF download from Hugging Face (simplest)
+
+Just download the model file directly with `wget` or `curl` — no installation needed:
+
+```bash
+# Example: Llama 3.2 3B (quantized, ~2 GB)
+wget https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+```
+
+You can browse available models at [huggingface.co/models](https://huggingface.co/models) — filter by `GGUF` format.
+
+---
+
+### Option 2: Ollama as a portable binary (no system install)
+
+Instead of running the install script, just download the binary directly:
+
+```bash
+curl -L https://ollama.com/download/ollama-linux-amd64 -o ollama
+chmod +x ollama
+./ollama serve &        # start the server in background
+./ollama pull llama3.2  # download a model
+./ollama run llama3.2   # run it
+```
+
+No `sudo`, no systemd service — just a single file you can move anywhere.
+
+---
+
+### Option 3: llama.cpp as a prebuilt binary
+
+Same idea — grab the prebuilt release binary from GitHub without compiling anything:
+
+```bash
+# Download the latest release (CPU version)
+wget https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-linux-x64.zip
+unzip llama-linux-x64.zip
+
+# Run directly with a GGUF model file
+./llama-cli -m ./your-model.gguf --interactive
+```
+
+---
+
+### Where models are stored
+
+When you download a GGUF file manually, it stays exactly where you put it — there's no hidden installation. You point the tool at the file path directly:
+
+```bash
+./llama-cli -m /home/yourname/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf --interactive
+```
+
+---
+
+**Recommended approach for "no installation":** Download a GGUF file from Hugging Face + grab the portable Ollama binary. Both are single-file, no root access needed, and fully self-contained.
+
+
+
+Once you have the `.gguf` file downloaded, you need a runtime to actually run it. Here are your options, from simplest to most advanced:
+
+---
+
+### Option 1: Ollama (easiest)
+
+Ollama can import a local GGUF file directly:
+
+```bash
+# 1. Create a simple Modelfile
+echo 'FROM ./qwen2.5-coder-32b-instruct-q4_k_m.gguf' > Modelfile
+
+# 2. Import it into Ollama
+./ollama create qwen-coder -f Modelfile
+
+# 3. Run it
+./ollama run qwen-coder
+```
+
+That's it — you'll get an interactive chat prompt in your terminal.
+
+---
+
+### Option 2: llama.cpp binary (no install)
+
+Download the prebuilt binary and point it at your file:
+
+```bash
+# Download prebuilt llama.cpp
+wget https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-linux-x64.zip
+unzip llama-linux-x64.zip
+
+# Run interactive chat
+./llama-cli \
+  -m ./qwen2.5-coder-32b-instruct-q4_k_m.gguf \
+  --interactive \
+  --chat-template qwen \
+  -c 4096
+```
+
+---
+
+### Option 3: Add a Web UI (recommended for daily use)
+
+If you want a browser-based chat interface instead of the terminal:
+
+```bash
+# With Ollama already running, start Open WebUI
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
+
+Then open `http://localhost:3000` in your browser — you get a full ChatGPT-like interface pointing at your local model.
+
+---
+
+### What is GGUF format?
+
+GGUF (**GGML Unified Format**) is the standard file format for running quantized LLMs locally. Think of it as a self-contained bundle that includes:
+
+- The model weights (compressed/quantized)
+- The tokenizer
+- Model metadata and configuration
+
+All in a **single file** — which is why you can just download it and run it without any complex setup. It was designed specifically for efficient CPU and GPU inference with llama.cpp, and is now supported by virtually every local AI tool (Ollama, LM Studio, text-generation-webui, etc.).
+
+---
+
+### Recommended path in summary
+
+```
+Download .gguf file
+       ↓
+Download portable ollama binary
+       ↓
+ollama create + ollama run
+       ↓
+(optional) Add Open WebUI for browser interface
+```
+
+That gives you a fully local, private AI coding assistant with zero cloud dependency.
+
+---
+
+| Model | Size | Quality |
+|-------|------|---------|
+| `qwen2.5-coder-32b-instruct-q2_k` | ~12 GB | Lower |
+| `qwen2.5-coder-32b-instruct-q4_k_m` | **19.9 GB** | ✅ Recommended |
+| `qwen2.5-coder-32b-instruct-q5_k_m` | ~23.3 GB | Better |
+| `qwen2.5-coder-7b-instruct-q4_k_m` | ~5 GB | Smaller model |
+
