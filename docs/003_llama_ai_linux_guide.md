@@ -715,3 +715,34 @@ That gives you a fully local, private AI coding assistant with zero cloud depend
 | `qwen2.5-coder-32b-instruct-q5_k_m` | ~23.3 GB | Better |
 | `qwen2.5-coder-7b-instruct-q4_k_m` | ~5 GB | Smaller model |
 
+---
+
+llama-server.exe -m Qwen3-Coder-30B-A3B-Instruct-UD-IQ3_XXS.gguf ^
+--port 8080 ^
+-ngl 99 ^
+-c 80000 ^
+-b 1024 ^
+-ub 1024 ^
+--cache-type-k q4_0 ^
+--cache-type-v q4_0 ^
+--temp 0.1 ^
+--repeat-penalty 1.0 ^
+--parallel 1 ^
+--api-key sk-no-key-required
+
+---
+
+https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/tree/main?show_file_info=Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf
+
+llama-server \
+  -m Qwen3-Coder-30B-A3B-Instruct-UD-Q4_K_XL.gguf \
+  -c 32768 \
+  -ngl 42 \
+  -fa \
+  -t 12 \
+  -b 512 \
+  -ub 128 \
+  --cache-type-k q8_0 \
+  --cache-type-v q8_0 \
+  --flash-attn \
+  --mlock
