@@ -40,7 +40,7 @@ Supports DBC, KCD, SYM, ARXML file parsing and encoding/decoding of CAN frames, 
 
 ### 7. **Canverter Pro** *(Python/PySide6 — cross-platform)*
 A free, open-source, offline desktop app built on cantools and python-can, with a PySide6 + Matplotlib GUI. It reads `.asc`, `.blf`, `.trc`, `.log` files, decodes them using DBC files, and exports to CSV with optional resampling and graph visualization. Newer project (2026) but fills the gap between full GUI tools and raw Python scripts nicely.
-- GitHub: search "Canverter Pro" / birolocal
+- GitHub: https://github.com/birol91/canverter_desktop_app
 
 ---
 

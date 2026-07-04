@@ -746,3 +746,18 @@ llama-server \
   --cache-type-v q8_0 \
   --flash-attn \
   --mlock
+
+https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
+
+llama-server.exe -m Qwen3-Coder-30B-A3B-Instruct-UD-IQ3_XXS.gguf ^
+--port 8080 ^
+-ngl 99 ^
+-c 80000 ^
+-b 1024 ^
+-ub 1024 ^
+--cache-type-k q4_0 ^
+--cache-type-v q4_0 ^
+--temp 0.1 ^
+--repeat-penalty 1.0 ^
+--parallel 1 ^
+--api-key sk-no-key-required
